@@ -2,42 +2,43 @@
 import turtle
 import threading
 #=========================================================================================
-turtles = []
-tr_angle = [90]
-tr_pos = []
-tr_pos2 = []
-tr_pos3 = [(100,0)]
-tr_x = [100]
+h_m = 8
+turtles = [{} for _ in range(2**h_m)] 
+turtles[0] = {"angle": 90,"pos": "", "pos2": "","pos3": (100,0), "x": 100}
+
 #=========================================================================================
 t = turtle.Turtle()
-t.speed('fastest')
-turtles.append(t)
+t.speed("fastest")
+turtles[0].update({"turtle": t})
 #=========================================================================================
 def quadrat(wid, tr_id):
     for i in range(4):
-        turtles[tr_id].forward(wid)
-        turtles[tr_id].right(90)
+        turtles[tr_id]["turtle"].forward(wid)
+        turtles[tr_id]["turtle"].right(90)
         if i == 1:
-            if len(tr_pos) >= tr_id + 1:
-                tr_pos[tr_id] = turtles[tr_id].position()
-            else:
-                tr_pos.append(turtles[tr_id].position())
-    turtles[tr_id].forward(wid)
+            turtles[tr_id].update({"pos": turtles[tr_id]["turtle"].position()}) 
+    turtles[tr_id]["turtle"].forward(wid)
 
-def create(tr_id):
-    quadrat(tr_x[tr_id], tr_id)
-    turtles[tr_id].right(60)
-    tr_angle.append(turtles[tr_id].heading() + 90)
-    tr_pos3.append(turtles[tr_id].position())
-    turtles[tr_id].forward(tr_x[tr_id] * 0.86)
-    tr_x.append(tr_x[tr_id] * 0.86)
-    if len(tr_pos2) >= tr_id + 1:
-        tr_pos2[tr_id] = turtles[tr_id].position()
-    else:
-        tr_pos2.append(turtles[tr_id].position())
-    tr_x[tr_id] = turtles[tr_id].distance(tr_pos[tr_id]) 
-    turtles[tr_id].goto(tr_pos[tr_id])
-    turtles[tr_id].goto(tr_pos2[tr_id])
+def create(tr_id, f):
+    quadrat(turtles[tr_id]["x"], tr_id)
+    turtles[tr_id]["turtle"].right(60)
+    print(turtles)
+    turtles[1 + f].update({"angle": turtles[tr_id]["turtle"].heading() + 90})
+    print(turtles)
+    turtles[1 + f].update({"pos3": turtles[tr_id]["turtle"].position()})
+    print(turtles)
+    turtles[tr_id]["turtle"].forward(turtles[tr_id]["x"] * 0.86)
+    print(turtles)
+    turtles[1 + f].update({"x": turtles[tr_id]["x"] * 0.86})
+    print(turtles)
+    turtles[tr_id].update({"pos2": turtles[tr_id]["turtle"].position()}) 
+    print(turtles)
+    turtles[tr_id].update({"x": turtles[tr_id]["turtle"].distance(turtles[tr_id]["pos"])})  
+    print(turtles)
+    turtles[tr_id]["turtle"].goto(turtles[tr_id]["pos"])
+    print(turtles)
+    turtles[tr_id]["turtle"].goto(turtles[tr_id]["pos2"])
+    print(turtles)
   
     
 
@@ -45,26 +46,31 @@ def create_turtle(x, id):
     t = turtle.Turtle()
     t.shapesize(0.2,0.2,0.3)
     t.shape('turtle')
-    t.speed('fastest')
+    t.speed("fastest")
     t.up()
-    t.goto(tr_pos3[id])
+    t.goto(turtles[id]["pos3"])
     t.down()
-    t.setheading(tr_angle[id])
-    tr_x.append(x)
-    turtles.append(t)
+    t.setheading(turtles[id]["angle"])
+    turtles[id].update({"x": x})
+    turtles[id].update({"turtle": t})
     
 
 #=========================================================================================
-turtles[0].up()
-turtles[0].goto(tr_pos3[0])
-turtles[0].down()
-turtles[0].setheading(tr_angle[0])
+turtles[0]["turtle"].up()
+turtles[0]["turtle"].goto(turtles[0]["pos3"])
+turtles[0]["turtle"].down()
+turtles[0]["turtle"].setheading(turtles[0]["angle"])
 #=========================================================================================
-for i in range(8):
-    for i in range(len(turtles)):
-        create(i)
-        create_turtle(tr_x[i + 1], i + 1)
-        create(i + 1)
+print(turtles)
+for i in range(h_m):   
+    for y in range(2 ** i ):
+        create(y, 2 ** i + y - 1 )
+        print(turtles)
+        create_turtle(turtles[2 ** i + y]["x"], 2 ** i + y )
+        print (turtles)
+        # create(y + 1, 2 ** i + y + 1)
+
+    
         
 
 
@@ -81,3 +87,4 @@ for i in range(8):
 
 #=========================================================================================
 turtle.mainloop()
+
